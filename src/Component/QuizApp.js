@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import {questions} from "./questions"
+import { Link, redirect } from 'react-router-dom';
 import Review from './Review';
 
 
-function QuizApp() {
+
+function QuizApp(props) {
+  var questions=props.question
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState(Array(questions.length).fill(null));
   const [showScore, setShowScore] = useState(false);
   const [score, setScore] = useState(0);
   const [arr, setArr] = useState([]);
+  const [show, setShow] = useState(false)
 
   useEffect(() => {
     if (showScore) {
@@ -22,6 +24,7 @@ function QuizApp() {
     const newAnswers = [...answers];
     newAnswers[currentQuestion] = selectedOption;
     setAnswers(newAnswers);
+
   };
 
   const handleNextClick = () => {
@@ -40,26 +43,34 @@ function QuizApp() {
     setShowScore(true);
     const newArr = [...answers];
     setArr(newArr);
+    props.setAns(answers)
+    console.log(answers,"answessss")
+
   };
 
   const calculateScore = () => {
     let calculatedScore = 0;
     for (let i = 0; i < questions.length; i++) {
-      if (answers[i] === questions[i].answer) {
+      if (answers[i] === questions[i].correctAnswer) {
         calculatedScore++;
-      }
+      } 
     }
     return calculatedScore;
   };
 
-  const { review } = useParams();
+  const handelreview =()=>{
+    setShow(true)
+    redirect("/review")
+  }
+  console.log("show",show)
+
 
   return (
     <div>
       {showScore ? (
         <div>
           <h2>Your Score: {score} out of {questions.length}</h2>
-          <Link to="/Check">Review</Link>
+          <Link to="/review" onClick={handelreview}>Review</Link>
         </div>
       ) : (
         <div>
@@ -82,8 +93,6 @@ function QuizApp() {
           <button onClick={handleSubmit}>Submit</button>
         </div>
       )}
-
-      {review && <Review myArr={arr} />}
     </div>
   );
 }
